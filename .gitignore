@@ -1,0 +1,35 @@
+# Internal documentation and strategy
+docs/
+
+# Development environment
+covered_caller_env/
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Git credentials and tokens
+.env
+*.token
+
+# Backup files
+*.backup
+*.bak
+
+# Test files
+test_*
+*_test.py
