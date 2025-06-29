@@ -1,4 +1,4 @@
-# Gumroad Product Listing - "Rental Income" Version
+# Gumroad Product Listing - Version 1
 
 ## Product Title
 **Turn Your Stock Holdings Into Monthly Income - AI-Powered Covered Call Calculator**
