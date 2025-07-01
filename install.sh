@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Covered Call Calculator - Bulletproof Installer
+# Covered Call Calculator - Bulletproof Installer v1.1
 # Usage: curl -sSL https://raw.githubusercontent.com/jmd-jude/covered_call/main/install.sh | bash
 
 set -e
@@ -31,7 +31,8 @@ test_python() {
         local major=$(echo "$version" | cut -d. -f1)
         local minor=$(echo "$version" | cut -d. -f2)
         
-        if [[ $major -eq 3 && $minor -ge 8 ]]; then
+        # Updated requirement: Python 3.10+ (MCP requirement)
+        if [[ $major -eq 3 && $minor -ge 10 ]] || [[ $major -gt 3 ]]; then
             echo "$python_cmd"
             return 0
         fi
@@ -40,11 +41,11 @@ test_python() {
 }
 
 # Find the best Python installation
-echo "🔍 Checking for Python 3.8+..."
+echo "🔍 Checking for Python 3.10+..."
 
 PYTHON_CMD=""
-# Try common Python commands in order of preference
-for cmd in python3.12 python3.11 python3.10 python3.9 python3.8 python3 python; do
+# Try common Python commands in order of preference (prioritize newer versions)
+for cmd in python3.13 python3.12 python3.11 python3.10 python3 python; do
     if PYTHON_CMD=$(test_python "$cmd"); then
         break
     fi
@@ -52,25 +53,43 @@ done
 
 if [[ -z "$PYTHON_CMD" ]]; then
     echo ""
-    echo "❌ Python 3.8+ not found!"
+    echo "❌ Python 3.10+ not found!"
     echo ""
+    
+    # Check if they have an older Python version
+    for cmd in python3 python; do
+        if command -v "$cmd" &> /dev/null; then
+            local old_version=$($cmd --version 2>&1 | grep -oE '[0-9]+\.[0-9]+' | head -1)
+            if [[ -n "$old_version" ]]; then
+                echo "Found Python $old_version, but the MCP library requires Python 3.10 or higher."
+                echo ""
+                break
+            fi
+        fi
+    done
+    
     echo "SOLUTION:"
     if [[ "$PLATFORM" == "Mac" ]]; then
-        echo "1. Install Python from https://www.python.org/downloads/"
-        echo "   OR"
-        echo "2. Install Homebrew and run: brew install python3"
-        echo "   OR"
-        echo "3. Install from Mac App Store: search 'Python 3'"
+        echo "1. 🌟 RECOMMENDED: Install Python 3.12 from https://www.python.org/downloads/"
+        echo "   (Choose the 'macOS 64-bit universal2 installer')"
         echo ""
-        echo "Then re-run this installer."
+        echo "2. Alternative: Install via Homebrew"
+        echo "   brew install python@3.12"
         echo ""
-        echo "Need help? Email: jude.hoffner@gmail.com"
+        echo "3. Alternative: Install via Mac App Store"
+        echo "   Search for 'Python 3' and install Python 3.12+"
     else
-        echo "Install Python 3.8+ using your package manager:"
-        echo "  Ubuntu/Debian: sudo apt install python3 python3-venv"
-        echo "  CentOS/RHEL: sudo yum install python3 python3-venv"
+        echo "Install Python 3.10+ using your package manager:"
+        echo "  Ubuntu/Debian: sudo apt update && sudo apt install python3.10 python3.10-venv"
+        echo "  CentOS/RHEL: sudo dnf install python3.10 python3.10-venv"
         echo "  Arch: sudo pacman -S python"
     fi
+    
+    echo ""
+    echo "After installing Python 3.10+, re-run this installer:"
+    echo "curl -sSL https://raw.githubusercontent.com/jmd-jude/covered_call/main/install.sh | bash"
+    echo ""
+    echo "Need help? Email: jude.hoffner@gmail.com"
     exit 1
 fi
 
@@ -84,14 +103,13 @@ if ! $PYTHON_CMD -m venv "$TEST_DIR" &>/dev/null; then
     echo ""
     echo "SOLUTION:"
     if [[ "$PLATFORM" == "Mac" ]]; then
-        echo "Run this command first:"
-        echo "  $PYTHON_CMD -m pip install --upgrade pip"
-        echo ""
-        echo "If that fails, reinstall Python from https://www.python.org/downloads/"
+        echo "Your Python installation might be incomplete. Try:"
+        echo "1. $PYTHON_CMD -m pip install --upgrade pip"
+        echo "2. If that fails, reinstall Python 3.12+ from https://www.python.org/downloads/"
     else
-        echo "Install python3-venv:"
-        echo "  Ubuntu/Debian: sudo apt install python3-venv"
-        echo "  CentOS/RHEL: sudo yum install python3-venv"
+        echo "Install python venv module:"
+        echo "  Ubuntu/Debian: sudo apt install python3.10-venv"
+        echo "  CentOS/RHEL: sudo dnf install python3.10-venv"
     fi
     echo ""
     echo "Then re-run this installer."
@@ -128,7 +146,7 @@ fi
 echo "🐍 Setting up Python environment..."
 if ! $PYTHON_CMD -m venv venv; then
     echo "❌ Failed to create virtual environment!"
-    echo "Try reinstalling Python and run this installer again."
+    echo "Try reinstalling Python 3.12+ and run this installer again."
     echo "Need help? Email: jude.hoffner@gmail.com"
     exit 1
 fi
@@ -137,26 +155,42 @@ fi
 echo "📦 Installing dependencies..."
 source venv/bin/activate
 
-# Upgrade pip first
+# Aggressively upgrade pip (critical for MCP installation)
+echo "🔄 Upgrading pip (required for MCP)..."
 if ! pip install --upgrade pip --quiet; then
-    echo "⚠️  Warning: Could not upgrade pip, continuing..."
+    echo "⚠️  Warning: Could not upgrade pip automatically."
+    echo "This might cause MCP installation to fail."
+    echo ""
+    echo "If installation fails, try running:"
+    echo "  $PYTHON_CMD -m pip install --upgrade pip"
+    echo "Then re-run this installer."
 fi
 
-# Install MCP
+# Verify pip version
+PIP_VERSION=$(pip --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+' | head -1)
+echo "✅ Using pip version: $PIP_VERSION"
+
+# Install MCP with better error handling
+echo "📦 Installing MCP library..."
 if ! pip install mcp --quiet; then
-    echo "❌ Failed to install dependencies!"
+    echo "❌ Failed to install MCP library!"
     echo ""
-    echo "SOLUTION:"
-    echo "Your Python installation might be incomplete."
-    echo "Try:"
-    echo "1. Reinstall Python from https://www.python.org/downloads/"
-    echo "2. Re-run this installer"
+    echo "This usually means:"
+    echo "1. Your Python version is too old (need 3.10+)"
+    echo "2. Your pip version is too old"
+    echo "3. Network connectivity issues"
     echo ""
+    echo "SOLUTIONS:"
+    echo "1. Upgrade to Python 3.12+ from https://www.python.org/downloads/"
+    echo "2. Upgrade pip: $PYTHON_CMD -m pip install --upgrade pip"
+    echo "3. Try installing MCP manually: $PYTHON_CMD -m pip install mcp"
+    echo ""
+    echo "Then re-run this installer."
     echo "Need help? Email: jude.hoffner@gmail.com"
     exit 1
 fi
 
-echo "✅ Dependencies installed"
+echo "✅ Dependencies installed successfully"
 
 # Create or update Claude Desktop config
 echo "⚙️  Configuring Claude Desktop..."
@@ -219,7 +253,10 @@ fi
 echo "🧪 Testing installation..."
 if ! "$INSTALL_DIR/venv/bin/python" -c "import mcp; print('MCP imported successfully')" &>/dev/null; then
     echo "❌ Installation test failed!"
-    echo "Something went wrong during setup."
+    echo "MCP library was installed but cannot be imported."
+    echo "This suggests a Python environment issue."
+    echo ""
+    echo "Try reinstalling Python 3.12+ and running this installer again."
     echo "Need help? Email: jude.hoffner@gmail.com"
     exit 1
 fi
@@ -227,10 +264,16 @@ fi
 echo ""
 echo "🎉 Installation Complete!"
 echo ""
+echo "🔥 NEW FEATURES in v1.1:"
+echo "  • Multi-timeframe comparison (weekly vs monthly strategies)"
+echo "  • Enhanced UX with better analysis formatting"
+echo "  • Improved professional reports"
+echo ""
 echo "Next steps:"
-echo "1. Restart Claude Desktop completely (Cmd+Q then reopen on Mac)"
-echo "2. Test with: 'Calculate covered call for AAPL at \$200 with 25% IV and 14 days'"
-echo "3. Try: 'Create a professional report for Tesla at \$250 with 40% IV'"
+echo "1. 🔄 Restart Claude Desktop completely (Cmd+Q then reopen on Mac)"
+echo "2. 🧪 Test: 'Calculate covered call for AAPL at \$200 with 25% IV and 14 days'"
+echo "3. ⭐ Try new feature: 'Compare timeframes for Tesla at \$250 with 40% IV'"
+echo "4. 📄 Generate reports: 'Create professional report for Microsoft covered calls'"
 echo ""
 echo "🚀 Happy trading!"
 echo ""
@@ -271,3 +314,5 @@ EOF
 
 chmod +x "$INSTALL_DIR/uninstall.sh"
 echo "📝 To uninstall later, run: $INSTALL_DIR/uninstall.sh"
+echo ""
+echo "💡 Updates: When we release new features, just re-run the install command!"
