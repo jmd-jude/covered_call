@@ -3,9 +3,6 @@
 ## Product Title
 **Turn Your Stock Holdings Into Monthly Income - AI-Powered Covered Call Calculator**
 
-## Price
-**$24** (premium positioning)
-
 ## Product Description
 
 ### Transform Your Long-Term Stocks Into Cash-Flowing Assets
@@ -26,7 +23,7 @@ Sell covered calls with 84% mathematical probability of keeping the premium. Whe
 **It's as close to free money as exists in the markets.**
 
 **What You Get:**
-🎯 One-command installation (works on Mac & Linux)  
+🎯 One-click installation with DXT  
 🎯 AI integration with Claude Desktop  
 🎯 84% probability-based recommendations  
 🎯 Professional report generation  

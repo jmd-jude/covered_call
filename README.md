@@ -12,15 +12,7 @@ A professional options trading tool that integrates with Claude Desktop to provi
 
 ## Quick Install
 
-**One-line installation** (Mac/Linux):
-
-```bash
-curl -sSL https://raw.githubusercontent.com/jmd-jude/covered_call/main/install.sh | bash
-```
-
-Then restart Claude Desktop and ask:
-- *"Calculate a covered call strategy for AAPL at $200 with 25% IV and 14 days to expiry"*
-- *"Create a professional report for Tesla at $250 with 40% IV and 21 days"*
+DXT for CLaude Desktop
 
 ## What You Get
 
@@ -65,21 +57,6 @@ The calculator uses quantitative finance models based on:
 - Claude Desktop
 - Internet connection for installation
 
-## Manual Installation
-
-If you prefer manual setup:
-
-1. Clone this repository
-2. Create virtual environment: `python3 -m venv venv`
-3. Install dependencies: `source venv/bin/activate && pip install mcp`
-4. Update Claude Desktop config to include the server
-
-## Uninstalling
-
-Run the uninstall script:
-```bash
-~/.covered_call_calculator/uninstall.sh
-```
 
 ## Support
 
