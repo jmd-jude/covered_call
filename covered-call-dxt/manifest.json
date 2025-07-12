@@ -1,0 +1,59 @@
+{
+  "dxt_version": "0.1",
+  "name": "covered-call-calculator",
+  "display_name": "Stock Rental Income System",
+  "version": "1.1.0",
+  "description": "AI-powered covered call calculator that generates rental income from your stock holdings using 84% probability-based strategies",
+  "long_description": "Turn your buy-and-hold stocks into monthly income generators. Perfect for long-term investors who own stocks they never plan to sell - this calculator finds the optimal covered call strikes that give you an 84% chance of keeping both your shares AND the premium income. Think of it as collecting rent on stocks you already own. Whether you're holding Apple, Microsoft, or any stock for years, this tool shows you exactly which call options to sell to generate consistent cash flow without risking your core positions. Start with 'compare timeframes' to see your best strategy, then use 'analyze covered call' for specific trades.",
+  "author": {
+    "name": "Jude Hoffner",
+    "email": "jude.hoffner@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jmd-jude/covered_call"
+  },
+  "homepage": "https://hoffnerjude.gumroad.com/l/fqaqtk",
+  "keywords": ["covered calls", "options trading", "income generation", "investing", "finance", "volatility", "probability"],
+  "license": "MIT",
+  "server": {
+    "type": "python",
+    "entry_point": "covered_call_server.py",
+    "mcp_config": {
+      "command": "python3",
+      "args": ["${__dirname}/covered_call_server.py"],
+      "env": {
+        "PYTHONPATH": "${__dirname}/lib"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "get_started_guide",
+      "description": "🏁 Start here! Learn what this tool does and how to use it effectively for income generation"
+    },
+    {
+      "name": "analyze_covered_call",
+      "description": "Calculate optimal strike price and expected income for a specific stock position"
+    },
+    {
+      "name": "compare_timeframes", 
+      "description": "⚡ Compare weekly vs bi-weekly vs monthly strategies to maximize your returns"
+    },
+    {
+      "name": "estimate_annual_returns",
+      "description": "Project yearly income potential based on your trading frequency and market volatility"
+    },
+    {
+      "name": "create_professional_report",
+      "description": "📄 Generate a formal analysis document you can save, print, or share with advisors"
+    }
+  ],
+  "compatibility": {
+    "claude_desktop": ">=0.10.0",
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "python": ">=3.10.0"
+    }
+  }
+}
